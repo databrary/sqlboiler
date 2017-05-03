@@ -368,7 +368,7 @@ func makeStructMappingHelper(typ reflect.Type, prefix string, current uint64, de
 }
 
 func getBoilTag(field reflect.StructField) (name string, recurse bool) {
-	tag := field.Tag.Get("boil")
+	tag := field.Tag.Get("db")
 	name = field.Name
 
 	if len(tag) == 0 {
