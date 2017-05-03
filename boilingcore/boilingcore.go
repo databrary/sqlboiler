@@ -27,6 +27,8 @@ const (
 	templatesSingletonTestDirectory = "templates_test/singleton"
 
 	templatesTestMainDirectory = "templates_test/main_test"
+
+	templatesHelperDirectory = "templates_helpers"
 )
 
 // State holds the global data needed by most pieces to run
@@ -38,6 +40,7 @@ type State struct {
 	Dialect queries.Dialect
 
 	Templates              *templateList
+	HelperTemplates              []string
 	TestTemplates          *templateList
 	SingletonTemplates     *templateList
 	SingletonTestTemplates *templateList
@@ -207,7 +210,8 @@ func (s *State) initTemplates() error {
 			return err
 		}
 	}
-
+	h, err := filepath.Glob(filepath.Join(basePath, templatesHelperDirectory)+string(filepath.Separator)+"*.tpl")
+	s.HelperTemplates = append(s.HelperTemplates, h...)
 	return s.processReplacements()
 }
 
@@ -217,7 +221,6 @@ func (s *State) processReplacements() error {
 	if err != nil {
 		return err
 	}
-
 	for _, replace := range s.Config.Replacements {
 		splits := strings.Split(replace, ":")
 		if len(splits) != 2 {
@@ -247,6 +250,8 @@ func (s *State) processReplacements() error {
 		switch filepath.Dir(toReplace) {
 		case templatesDirectory:
 			err = replaceTemplate(s.Templates.Template, toReplaceFname, replaceWith)
+		case templatesHelperDirectory:
+			s.HelperTemplates = append(s.HelperTemplates, replaceWith)
 		case templatesSingletonDirectory:
 			err = replaceTemplate(s.SingletonTemplates.Template, toReplaceFname, replaceWith)
 		case templatesTestDirectory:

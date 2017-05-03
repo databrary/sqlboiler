@@ -1,7 +1,10 @@
 // Package bdb supplies the sql(b)oiler (d)ata(b)ase abstractions.
 package bdb
 
-import "github.com/pkg/errors"
+import (
+	"github.com/pkg/errors"
+	"fmt"
+)
 
 // Interface for a database driver. Functionality required to support a specific
 // database type (eg, MySQL, Postgres etc.)
@@ -53,7 +56,11 @@ func Tables(db Interface, schema string, whitelist, blacklist []string) ([]Table
 
 		for i, c := range t.Columns {
 			t.Columns[i] = db.TranslateColumnType(c)
+			t.HasCustom = t.HasCustom || t.Columns[i].IsCustom
+			fmt.Println(t.Columns[i].IsCustom, "in interface")
 		}
+
+
 
 		if t.PKey, err = db.PrimaryKeyInfo(schema, name); err != nil {
 			return nil, errors.Wrapf(err, "unable to fetch table pkey info (%s)", name)

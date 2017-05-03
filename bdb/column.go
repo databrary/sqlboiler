@@ -16,6 +16,7 @@ type Column struct {
 	Nullable  bool
 	Unique    bool
 	Validated bool
+	IsCustom  bool
 
 	// Postgres only extension bits
 	// ArrType is the underlying data type of the Postgres
@@ -64,6 +65,19 @@ func FilterColumnsByDefault(defaults bool, columns []Column) []Column {
 
 	return cols
 }
+
+func FilterColumnsByCustom(columns []Column) []Column {
+	var cols []Column
+
+	for _, c := range columns {
+		if c.IsCustom {
+			cols = append(cols, c)
+		}
+	}
+
+	return cols
+}
+
 
 // FilterColumnsByEnum generates the list of columns that are enum values.
 func FilterColumnsByEnum(columns []Column) []Column {

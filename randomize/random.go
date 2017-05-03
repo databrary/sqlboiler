@@ -97,6 +97,10 @@ func StableDBName(input string) string {
 	return randStrFromSource(stableSource(input), 40)
 }
 
+func RandomDBName(r *rand.Rand, input string) string {
+	return randStrFromSource(r, 40)
+}
+
 // stableSource takes an input value, and produces a random
 // seed from it that will produce very few collisions in
 // a 40 character random string made from a different alphabet.

@@ -53,6 +53,30 @@ func combineTypeImports(a imports, b map[string]imports, columns []bdb.Column) i
 		standard:   make(importList, len(a.standard)),
 		thirdParty: make(importList, len(a.thirdParty)),
 	}
+	copy(tmpImp.standard, a.standard)
+	copy(tmpImp.thirdParty, a.thirdParty)
+	for _, col := range columns {
+		for key, imp := range b {
+			if col.Type == key {
+				tmpImp.standard = append(tmpImp.standard, imp.standard...)
+				tmpImp.thirdParty = append(tmpImp.thirdParty, imp.thirdParty...)
+			}
+		}
+	}
+
+	tmpImp.standard = removeDuplicates(tmpImp.standard)
+	tmpImp.thirdParty = removeDuplicates(tmpImp.thirdParty)
+
+	sort.Sort(tmpImp.standard)
+	sort.Sort(tmpImp.thirdParty)
+	return tmpImp
+}
+
+func combineRelationTypeImports(a imports, b map[string]imports, columns []bdb.Column) imports {
+	tmpImp := imports{
+		standard:   make(importList, len(a.standard)),
+		thirdParty: make(importList, len(a.thirdParty)),
+	}
 
 	copy(tmpImp.standard, a.standard)
 	copy(tmpImp.thirdParty, a.thirdParty)
@@ -153,6 +177,7 @@ type importer struct {
 	TestMain mapImports
 
 	BasedOnType mapImports
+	CustomBasedOnType mapImports
 }
 
 // newImporter returns an importer struct with default import values
@@ -176,6 +201,7 @@ func newImporter() importer {
 			`"github.com/vattle/sqlboiler/queries/qm"`,
 			`"github.com/vattle/sqlboiler/strmangle"`,
 		},
+
 	}
 
 	imp.Singleton = mapImports{
@@ -199,18 +225,23 @@ func newImporter() importer {
 			`"bytes"`,
 			`"reflect"`,
 			`"testing"`,
+			`"os/exec"`,
+			`"os"`,
+			`"sort"`,
+			`"strings"`,
+
 		},
 		thirdParty: importList{
 			`"github.com/vattle/sqlboiler/boil"`,
 			`"github.com/vattle/sqlboiler/randomize"`,
 			`"github.com/vattle/sqlboiler/strmangle"`,
+			`"github.com/pmezard/go-difflib/difflib"`,
 		},
 	}
 
 	imp.TestSingleton = mapImports{
 		"boil_main_test": {
 			standard: importList{
-				`"database/sql"`,
 				`"flag"`,
 				`"fmt"`,
 				`"math/rand"`,
@@ -242,6 +273,8 @@ func newImporter() importer {
 		"boil_suites_test": {
 			standard: importList{
 				`"testing"`,
+				`"fmt"`,
+				`"os"`,
 			},
 		},
 	}
@@ -366,8 +399,88 @@ func newImporter() importer {
 		"types.Hstore": {
 			thirdParty: importList{`"github.com/vattle/sqlboiler/types"`},
 		},
+		"custom_types.Inet":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullInet":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.Segment":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullSegment":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.Release":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullRelease":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.Permission":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullPermission":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NoticeDelivery":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullNoticeDelivery":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.DataType":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullDataType":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
 	}
 
+	imp.CustomBasedOnType = mapImports{
+		"custom_types.Interval":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullInterval":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.Inet":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullInet":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.Segment":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullSegment":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.Release":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullRelease":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.Permission":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullPermission":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NoticeDelivery":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullNoticeDelivery":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.DataType":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+		"custom_types.NullDataType":  {
+			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},
+		},
+	}
 	return imp
 }
 
