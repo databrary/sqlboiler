@@ -3,7 +3,6 @@ package drivers
 import (
 	"database/sql"
 	"fmt"
-	"os"
 	"strings"
 
 	// Side-effect import sql driver
@@ -152,7 +151,7 @@ func (p *PostgresDriver) Columns(schema, tableName string) ([]bdb.Column, error)
 			)
 			else c.data_type
 			end
-		, c.data_type) as column_type,
+		) as column_type,
 
 		c.udt_name,
 		e.data_type as array_type,
@@ -348,6 +347,8 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 			c.Type = "null.Bool"
 		case "date", "time", "timestamp without time zone", "timestamp with time zone":
 			c.Type = "null.Time"
+		case "varchar":
+			c.Type = "null.String"
 		case "ARRAY":
 			if c.ArrType == nil {
 				panic("unable to get postgres ARRAY underlying type")
@@ -360,14 +361,14 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 				c.Type = "types.HStore"
 				c.DBType = "hstore"
 			} else {
-				c.Type = "custom_types.Null"+strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName,"_"), " ")), " "), "")
+				c.Type = "custom_types.Null" + strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName, "_"), " ")), " "), "")
 				fmt.Printf("Warning: Incompatible data type detected: %s %s\n", c.UDTName, c.Name)
 				fmt.Printf("used %s \n", c.Type)
 			}
 			c.IsCustom = true
 			fmt.Println(c.IsCustom, "in postgres")
 		default:
-			c.Type = "custom_types.Null"+strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName,"_"), " ")), " "), "")
+			c.Type = "custom_types.Null" + strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName, "_"), " ")), " "), "")
 			fmt.Printf("Warning: Incompatible data type detected: %s %s\n", c.UDTName, c.Name)
 			fmt.Printf("used %s \n", c.Type)
 			c.IsCustom = true
@@ -413,14 +414,14 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 				c.Type = "types.HStore"
 				c.DBType = "hstore"
 			} else {
-				c.Type = "custom_types."+strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName,"_"), " ")), " "), "")
+				c.Type = "custom_types." + strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName, "_"), " ")), " "), "")
 				fmt.Printf("Warning: Incompatible data type detected: %s %s\n", c.UDTName, c.Name)
 				fmt.Printf("used %s \n", c.Type)
 			}
 			c.IsCustom = true
 			fmt.Println(c.IsCustom, "in postgres")
 		default:
-			c.Type = "custom_types."+strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName,"_"), " ")), " "), "")
+			c.Type = "custom_types." + strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName, "_"), " ")), " "), "")
 			fmt.Printf("Warning: default data type used: %s %s\n", c.UDTName, c.Name)
 			fmt.Printf("used %s \n", c.Type)
 			c.IsCustom = true
@@ -466,4 +467,21 @@ func (p *PostgresDriver) LeftQuote() byte {
 // IndexPlaceholders returns true to indicate PSQL supports indexed placeholders
 func (p *PostgresDriver) IndexPlaceholders() bool {
 	return true
+}
+
+func (p *PostgresDriver) IsView(schema, tableName string) (bool, error) {
+	var err error
+
+	query := `
+		select exists (select * from information_schema.views where table_schema = $2 and table_name = $1);`
+
+	var isView bool
+	row := p.dbConn.QueryRow(query, tableName, schema)
+	if err = row.Scan(&isView); err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, err
+	}
+	return isView, nil
 }

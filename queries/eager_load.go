@@ -206,6 +206,7 @@ func (l loadRelationshipState) loadRelationshipsRecurse(depth int, obj reflect.V
 	}
 
 	bkind := kindStruct
+	//TODO: what does this do?
 	if derefed := reflect.Indirect(loadedObject); derefed.Kind() != reflect.Struct {
 		bkind = kindPtrSliceStruct
 

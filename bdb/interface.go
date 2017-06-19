@@ -38,6 +38,7 @@ type Interface interface {
 	LeftQuote() byte
 	RightQuote() byte
 	IndexPlaceholders() bool
+	IsView(schema, tableName string) (bool, error)
 }
 
 // Tables returns the metadata for all tables, minus the tables
@@ -68,8 +69,6 @@ func Tables(db Interface, schema string, whitelist, blacklist []string) ([]Table
 			fmt.Println(t.Columns[i].IsCustom, "in interface")
 		}
 
-
-
 		if t.PKey, err = db.PrimaryKeyInfo(schema, name); err != nil {
 			return nil, errors.Wrapf(err, "unable to fetch table pkey info (%s)", name)
 		}
@@ -78,6 +77,7 @@ func Tables(db Interface, schema string, whitelist, blacklist []string) ([]Table
 			return nil, errors.Wrapf(err, "unable to fetch table fkey info (%s)", name)
 		}
 
+		t.IsView, err = db.IsView(schema, name)
 		setIsJoinTable(&t)
 
 		tables = append(tables, t)

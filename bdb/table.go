@@ -10,8 +10,9 @@ type Table struct {
 	SchemaName string
 	Columns    []Column
 	HasCustom  bool
-	PKey  *PrimaryKey
-	FKeys []ForeignKey
+	IsView     bool
+	PKey       *PrimaryKey
+	FKeys      []ForeignKey
 
 	IsJoinTable bool
 
@@ -65,7 +66,7 @@ func (t Table) CanLastInsertID() bool {
 	return true
 }
 
-func (t Table)GetCustomColumns() []Column {
+func (t Table) GetCustomColumns() []Column {
 	ret := []Column{}
 	if t.HasCustom {
 		for _, v := range t.Columns {
@@ -75,4 +76,8 @@ func (t Table)GetCustomColumns() []Column {
 		}
 	}
 	return ret
+}
+
+func (t Table) HasPrimaryKey() bool {
+	return t.PKey != nil
 }

@@ -40,7 +40,7 @@ type State struct {
 	Dialect queries.Dialect
 
 	Templates              *templateList
-	HelperTemplates              []string
+	HelperTemplates        []string
 	TestTemplates          *templateList
 	SingletonTemplates     *templateList
 	SingletonTestTemplates *templateList
@@ -103,11 +103,12 @@ func New(config *Config) (*State, error) {
 // state given.
 func (s *State) Run(includeTests bool) error {
 	singletonData := &templateData{
-		Tables:           s.Tables,
-		Schema:           s.Config.Schema,
-		DriverName:       s.Config.DriverName,
-		UseLastInsertID:  s.Driver.UseLastInsertID(),
-		PkgName:          s.Config.PkgName,
+		Tables:          s.Tables,
+		Schema:          s.Config.Schema,
+		DriverName:      s.Config.DriverName,
+		UseLastInsertID: s.Driver.UseLastInsertID(),
+		PkgName:         s.Config.PkgName,
+		//TODO: implement elision for tables with no primary keys (like audit and views)
 		NoHooks:          s.Config.NoHooks,
 		NoAutoTimestamps: s.Config.NoAutoTimestamps,
 		Dialect:          s.Dialect,
@@ -210,7 +211,7 @@ func (s *State) initTemplates() error {
 			return err
 		}
 	}
-	h, err := filepath.Glob(filepath.Join(basePath, templatesHelperDirectory)+string(filepath.Separator)+"*.tpl")
+	h, err := filepath.Glob(filepath.Join(basePath, templatesHelperDirectory) + string(filepath.Separator) + "*.tpl")
 	s.HelperTemplates = append(s.HelperTemplates, h...)
 	return s.processReplacements()
 }
@@ -301,26 +302,27 @@ func (s *State) initDriver(driverName string) error {
 			s.Config.Postgres.Port,
 			s.Config.Postgres.SSLMode,
 		)
-	case "mysql":
-		s.Driver = drivers.NewMySQLDriver(
-			s.Config.MySQL.User,
-			s.Config.MySQL.Pass,
-			s.Config.MySQL.DBName,
-			s.Config.MySQL.Host,
-			s.Config.MySQL.Port,
-			s.Config.MySQL.SSLMode,
-		)
-	case "mssql":
-		s.Driver = drivers.NewMSSQLDriver(
-			s.Config.MSSQL.User,
-			s.Config.MSSQL.Pass,
-			s.Config.MSSQL.DBName,
-			s.Config.MSSQL.Host,
-			s.Config.MSSQL.Port,
-			s.Config.MSSQL.SSLMode,
-		)
-	case "mock":
-		s.Driver = &drivers.MockDriver{}
+		//TODO: i didn't implement isView for these because we're not running either of these dbsg
+		//case "mysql":
+		//	s.Driver = drivers.NewMySQLDriver(
+		//		s.Config.MySQL.User,
+		//		s.Config.MySQL.Pass,
+		//		s.Config.MySQL.DBName,
+		//		s.Config.MySQL.Host,
+		//		s.Config.MySQL.Port,
+		//		s.Config.MySQL.SSLMode,
+		//	)
+		//case "mssql":
+		//	s.Driver = drivers.NewMSSQLDriver(
+		//		s.Config.MSSQL.User,
+		//		s.Config.MSSQL.Pass,
+		//		s.Config.MSSQL.DBName,
+		//		s.Config.MSSQL.Host,
+		//		s.Config.MSSQL.Port,
+		//		s.Config.MSSQL.SSLMode,
+		//	)
+		//case "mock":
+		//	s.Driver = &drivers.MockDriver{}
 	}
 
 	if s.Driver == nil {
@@ -347,9 +349,10 @@ func (s *State) initTables(schema string, whitelist, blacklist []string) error {
 		return errors.New("no tables found in database")
 	}
 
-	if err := checkPKeys(s.Tables); err != nil {
-		return err
-	}
+	//TODO: primary keys should be better handled
+	//if err := checkPKeys(s.Tables); err != nil {
+	//	return err
+	//}
 
 	return nil
 }
@@ -385,7 +388,7 @@ func (s *State) initOutFolder() error {
 func checkPKeys(tables []bdb.Table) error {
 	var missingPkey []string
 	for _, t := range tables {
-		if t.PKey == nil {
+		if t.PKey == nil && !t.IsView {
 			missingPkey = append(missingPkey, t.Name)
 		}
 	}
