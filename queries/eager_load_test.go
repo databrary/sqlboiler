@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/vattle/sqlboiler/boil"
+	"github.com/databrary/sqlboiler/boil"
 )
 
 var testEagerCounters struct {
@@ -96,8 +96,8 @@ func (testEagerL) LoadChildMany(_ boil.Executor, singular bool, obj interface{})
 			o.R = &testEagerR{}
 		}
 		o.R.ChildMany = []*testEagerChild{
-			&testEagerChild{ID: 12},
-			&testEagerChild{ID: 13},
+			{ID: 12},
+			{ID: 13},
 		}
 	}
 
@@ -139,8 +139,8 @@ func (testEagerChildL) LoadNestedMany(_ boil.Executor, singular bool, obj interf
 			o.R = &testEagerChildR{}
 		}
 		o.R.NestedMany = []*testEagerNested{
-			&testEagerNested{ID: 22},
-			&testEagerNested{ID: 23},
+			{ID: 22},
+			{ID: 23},
 		}
 	}
 
@@ -303,8 +303,8 @@ func TestEagerLoadZeroParentsMany(t *testing.T) {
 	t.Parallel()
 
 	obj := []*testEager{
-		&testEager{},
-		&testEager{},
+		{},
+		{},
 	}
 
 	toLoad := []string{"ZeroMany.NestedMany", "ZeroOne.NestedOne", "ZeroMany.NestedMany", "ZeroOne.NestedOne"}

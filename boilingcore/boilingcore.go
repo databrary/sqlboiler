@@ -12,11 +12,11 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/databrary/sqlboiler/bdb"
+	"github.com/databrary/sqlboiler/bdb/drivers"
+	"github.com/databrary/sqlboiler/queries"
+	"github.com/databrary/sqlboiler/strmangle"
 	"github.com/pkg/errors"
-	"github.com/vattle/sqlboiler/bdb"
-	"github.com/vattle/sqlboiler/bdb/drivers"
-	"github.com/vattle/sqlboiler/queries"
-	"github.com/vattle/sqlboiler/strmangle"
 )
 
 const (
@@ -267,7 +267,7 @@ func (s *State) processReplacements() error {
 	return nil
 }
 
-var basePackage = "github.com/vattle/sqlboiler"
+var basePackage = "github.com/databrary/sqlboiler"
 
 func getBasePath(baseDirConfig string) (string, error) {
 	if len(baseDirConfig) > 0 {

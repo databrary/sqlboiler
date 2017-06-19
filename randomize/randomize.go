@@ -14,12 +14,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	null "gopkg.in/nullbio/null.v6"
+	"gopkg.in/nullbio/null.v6"
 
+	"github.com/databrary/sqlboiler/strmangle"
+	"github.com/databrary/sqlboiler/types"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
-	"github.com/vattle/sqlboiler/strmangle"
-	"github.com/vattle/sqlboiler/types"
 )
 
 var (

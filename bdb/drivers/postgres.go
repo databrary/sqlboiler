@@ -8,10 +8,10 @@ import (
 
 	// Side-effect import sql driver
 
+	"github.com/databrary/sqlboiler/bdb"
+	"github.com/databrary/sqlboiler/strmangle"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
-	"github.com/vattle/sqlboiler/bdb"
-	"github.com/vattle/sqlboiler/strmangle"
 )
 
 // PostgresDriver holds the database connection string and a handle

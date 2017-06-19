@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/databrary/sqlboiler/bdb"
+	"github.com/databrary/sqlboiler/bdb/drivers"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/vattle/sqlboiler/bdb"
-	"github.com/vattle/sqlboiler/bdb/drivers"
 )
 
 func TestTxtsFromOne(t *testing.T) {

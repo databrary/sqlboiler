@@ -5,8 +5,8 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/databrary/sqlboiler/bdb"
 	"github.com/pkg/errors"
-	"github.com/vattle/sqlboiler/bdb"
 )
 
 func TestImportsSort(t *testing.T) {
@@ -234,7 +234,7 @@ func TestCombineTypeImports(t *testing.T) {
 			`"fmt"`,
 		},
 		thirdParty: importList{
-			`"github.com/vattle/sqlboiler/boil"`,
+			`"github.com/databrary/sqlboiler/boil"`,
 		},
 	}
 
@@ -245,7 +245,7 @@ func TestCombineTypeImports(t *testing.T) {
 			`"time"`,
 		},
 		thirdParty: importList{
-			`"github.com/vattle/sqlboiler/boil"`,
+			`"github.com/databrary/sqlboiler/boil"`,
 			`"gopkg.in/nullbio/null.v6"`,
 		},
 	}
@@ -280,7 +280,7 @@ func TestCombineTypeImports(t *testing.T) {
 			`"time"`,
 		},
 		thirdParty: importList{
-			`"github.com/vattle/sqlboiler/boil"`,
+			`"github.com/databrary/sqlboiler/boil"`,
 			`"gopkg.in/nullbio/null.v6"`,
 		},
 	}
@@ -297,11 +297,11 @@ func TestCombineImports(t *testing.T) {
 
 	a := imports{
 		standard:   importList{"fmt"},
-		thirdParty: importList{"github.com/vattle/sqlboiler", "gopkg.in/nullbio/null.v6"},
+		thirdParty: importList{"github.com/databrary/sqlboiler", "gopkg.in/nullbio/null.v6"},
 	}
 	b := imports{
 		standard:   importList{"os"},
-		thirdParty: importList{"github.com/vattle/sqlboiler"},
+		thirdParty: importList{"github.com/databrary/sqlboiler"},
 	}
 
 	c := combineImports(a, b)
@@ -309,8 +309,8 @@ func TestCombineImports(t *testing.T) {
 	if c.standard[0] != "fmt" && c.standard[1] != "os" {
 		t.Errorf("Wanted: fmt, os got: %#v", c.standard)
 	}
-	if c.thirdParty[0] != "github.com/vattle/sqlboiler" && c.thirdParty[1] != "gopkg.in/nullbio/null.v6" {
-		t.Errorf("Wanted: github.com/vattle/sqlboiler, gopkg.in/nullbio/null.v6 got: %#v", c.thirdParty)
+	if c.thirdParty[0] != "github.com/databrary/sqlboiler" && c.thirdParty[1] != "gopkg.in/nullbio/null.v6" {
+		t.Errorf("Wanted: github.com/databrary/sqlboiler, gopkg.in/nullbio/null.v6 got: %#v", c.thirdParty)
 	}
 }
 
