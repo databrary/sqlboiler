@@ -8,10 +8,10 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/databrary/sqlboiler/bdb"
+	"github.com/databrary/sqlboiler/queries"
+	"github.com/databrary/sqlboiler/strmangle"
 	"github.com/pkg/errors"
-	"github.com/vattle/sqlboiler/bdb"
-	"github.com/vattle/sqlboiler/queries"
-	"github.com/vattle/sqlboiler/strmangle"
 )
 
 // templateData for sqlboiler templates
@@ -226,6 +226,7 @@ var templateFunctions = template.FuncMap{
 	"txtsFromToMany":   txtsFromToMany,
 
 	// dbdrivers ops
+	"filterColumnsByAuto":    bdb.FilterColumnsByAuto,
 	"filterColumnsByDefault": bdb.FilterColumnsByDefault,
 	"filterColumnsByCustom": bdb.FilterColumnsByCustom,
 	"filterColumnsByEnum":    bdb.FilterColumnsByEnum,

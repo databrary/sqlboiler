@@ -1,8 +1,8 @@
 package drivers
 
 import (
-	"github.com/vattle/sqlboiler/bdb"
-	"github.com/vattle/sqlboiler/strmangle"
+	"github.com/databrary/sqlboiler/bdb"
+	"github.com/databrary/sqlboiler/strmangle"
 )
 
 // MockDriver is a mock implementation of the bdb driver Interface
@@ -117,6 +117,9 @@ func (m *MockDriver) PrimaryKeyInfo(schema, tableName string) (*bdb.PrimaryKey, 
 
 // UseLastInsertID returns a database mock LastInsertID compatibility flag
 func (m *MockDriver) UseLastInsertID() bool { return false }
+
+// UseTopClause returns a database mock SQL TOP clause compatibility flag
+func (m *MockDriver) UseTopClause() bool { return false }
 
 // Open mimics a database open call and returns nil for no error
 func (m *MockDriver) Open() error { return nil }

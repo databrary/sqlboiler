@@ -3,13 +3,14 @@ package bdb
 import (
 	"testing"
 
-	"github.com/vattle/sqlboiler/strmangle"
+	"github.com/databrary/sqlboiler/strmangle"
 )
 
 type testMockDriver struct{}
 
 func (m testMockDriver) TranslateColumnType(c Column) Column { return c }
 func (m testMockDriver) UseLastInsertID() bool               { return false }
+func (m testMockDriver) UseTopClause() bool                  { return false }
 func (m testMockDriver) Open() error                         { return nil }
 func (m testMockDriver) Close()                              {}
 
@@ -121,6 +122,14 @@ func TestTables(t *testing.T) {
 
 	if len(tables) != 7 {
 		t.Errorf("Expected len 7, got: %d\n", len(tables))
+	}
+
+	prev := ""
+	for i := range tables {
+		if prev >= tables[i].Name {
+			t.Error("tables are not sorted")
+		}
+		prev = tables[i].Name
 	}
 
 	pilots := GetTable(tables, "pilots")

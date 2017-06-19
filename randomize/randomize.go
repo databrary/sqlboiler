@@ -14,12 +14,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	null "gopkg.in/nullbio/null.v6"
+	"gopkg.in/nullbio/null.v6"
 
+	"github.com/databrary/sqlboiler/strmangle"
+	"github.com/databrary/sqlboiler/types"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
-	"github.com/vattle/sqlboiler/strmangle"
-	"github.com/vattle/sqlboiler/types"
 )
 
 var (
@@ -627,6 +627,8 @@ func randEnumValue(enum string) (string, error) {
 	vals := strmangle.ParseEnumVals(enum)
 	if vals == nil || len(vals) == 0 {
 		return "", fmt.Errorf("unable to parse enum string: %s", enum)
+	} else if len(vals) == 1 {
+		return vals[0], nil
 	}
 
 	return vals[rand.Intn(len(vals)-1)], nil

@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/vattle/sqlboiler/bdb"
+	"github.com/databrary/sqlboiler/bdb"
 )
 
 // imports defines the optional standard imports and
@@ -196,10 +196,10 @@ func newImporter() importer {
 		},
 		thirdParty: importList{
 			`"github.com/pkg/errors"`,
-			`"github.com/vattle/sqlboiler/boil"`,
-			`"github.com/vattle/sqlboiler/queries"`,
-			`"github.com/vattle/sqlboiler/queries/qm"`,
-			`"github.com/vattle/sqlboiler/strmangle"`,
+			`"github.com/databrary/sqlboiler/boil"`,
+			`"github.com/databrary/sqlboiler/queries"`,
+			`"github.com/databrary/sqlboiler/queries/qm"`,
+			`"github.com/databrary/sqlboiler/strmangle"`,
 		},
 
 	}
@@ -207,15 +207,15 @@ func newImporter() importer {
 	imp.Singleton = mapImports{
 		"boil_queries": {
 			thirdParty: importList{
-				`"github.com/vattle/sqlboiler/boil"`,
-				`"github.com/vattle/sqlboiler/queries"`,
-				`"github.com/vattle/sqlboiler/queries/qm"`,
+				`"github.com/databrary/sqlboiler/boil"`,
+				`"github.com/databrary/sqlboiler/queries"`,
+				`"github.com/databrary/sqlboiler/queries/qm"`,
 			},
 		},
 		"boil_types": {
 			thirdParty: importList{
 				`"github.com/pkg/errors"`,
-				`"github.com/vattle/sqlboiler/strmangle"`,
+				`"github.com/databrary/sqlboiler/strmangle"`,
 			},
 		},
 	}
@@ -232,10 +232,10 @@ func newImporter() importer {
 
 		},
 		thirdParty: importList{
-			`"github.com/vattle/sqlboiler/boil"`,
-			`"github.com/vattle/sqlboiler/randomize"`,
-			`"github.com/vattle/sqlboiler/strmangle"`,
 			`"github.com/pmezard/go-difflib/difflib"`,
+			`"github.com/databrary/sqlboiler/boil"`,
+			`"github.com/databrary/sqlboiler/randomize"`,
+			`"github.com/databrary/sqlboiler/strmangle"`,
 		},
 	}
 
@@ -254,7 +254,7 @@ func newImporter() importer {
 				`"github.com/kat-co/vala"`,
 				`"github.com/pkg/errors"`,
 				`"github.com/spf13/viper"`,
-				`"github.com/vattle/sqlboiler/boil"`,
+				`"github.com/databrary/sqlboiler/boil"`,
 			},
 		},
 		"boil_queries_test": {
@@ -267,7 +267,7 @@ func newImporter() importer {
 				`"regexp"`,
 			},
 			thirdParty: importList{
-				`"github.com/vattle/sqlboiler/boil"`,
+				`"github.com/databrary/sqlboiler/boil"`,
 			},
 		},
 		"boil_suites_test": {
@@ -294,8 +294,8 @@ func newImporter() importer {
 			thirdParty: importList{
 				`"github.com/pkg/errors"`,
 				`"github.com/spf13/viper"`,
-				`"github.com/vattle/sqlboiler/bdb/drivers"`,
-				`"github.com/vattle/sqlboiler/randomize"`,
+				`"github.com/databrary/sqlboiler/bdb/drivers"`,
+				`"github.com/databrary/sqlboiler/randomize"`,
 				`_ "github.com/lib/pq"`,
 			},
 		},
@@ -313,9 +313,26 @@ func newImporter() importer {
 			thirdParty: importList{
 				`"github.com/pkg/errors"`,
 				`"github.com/spf13/viper"`,
-				`"github.com/vattle/sqlboiler/bdb/drivers"`,
-				`"github.com/vattle/sqlboiler/randomize"`,
+				`"github.com/databrary/sqlboiler/bdb/drivers"`,
+				`"github.com/databrary/sqlboiler/randomize"`,
 				`_ "github.com/go-sql-driver/mysql"`,
+			},
+		},
+		"mssql": {
+			standard: importList{
+				`"bytes"`,
+				`"database/sql"`,
+				`"fmt"`,
+				`"os"`,
+				`"os/exec"`,
+				`"strings"`,
+			},
+			thirdParty: importList{
+				`"github.com/pkg/errors"`,
+				`"github.com/spf13/viper"`,
+				`"github.com/databrary/sqlboiler/bdb/drivers"`,
+				`"github.com/databrary/sqlboiler/randomize"`,
+				`_ "github.com/denisenkom/go-mssqldb"`,
 			},
 		},
 	}
@@ -379,25 +396,25 @@ func newImporter() importer {
 			standard: importList{`"time"`},
 		},
 		"types.JSON": {
-			thirdParty: importList{`"github.com/vattle/sqlboiler/types"`},
+			thirdParty: importList{`"github.com/databrary/sqlboiler/types"`},
 		},
 		"types.BytesArray": {
-			thirdParty: importList{`"github.com/vattle/sqlboiler/types"`},
+			thirdParty: importList{`"github.com/databrary/sqlboiler/types"`},
 		},
 		"types.Int64Array": {
-			thirdParty: importList{`"github.com/vattle/sqlboiler/types"`},
+			thirdParty: importList{`"github.com/databrary/sqlboiler/types"`},
 		},
 		"types.Float64Array": {
-			thirdParty: importList{`"github.com/vattle/sqlboiler/types"`},
+			thirdParty: importList{`"github.com/databrary/sqlboiler/types"`},
 		},
 		"types.BoolArray": {
-			thirdParty: importList{`"github.com/vattle/sqlboiler/types"`},
+			thirdParty: importList{`"github.com/databrary/sqlboiler/types"`},
 		},
 		"types.StringArray": {
-			thirdParty: importList{`"github.com/vattle/sqlboiler/types"`},
+			thirdParty: importList{`"github.com/databrary/sqlboiler/types"`},
 		},
 		"types.Hstore": {
-			thirdParty: importList{`"github.com/vattle/sqlboiler/types"`},
+			thirdParty: importList{`"github.com/databrary/sqlboiler/types"`},
 		},
 		"custom_types.Inet":  {
 			thirdParty: importList{`"github.com/databrary/databrary/db/models/custom_types"`},

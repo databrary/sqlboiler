@@ -7,9 +7,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/databrary/sqlboiler/boil"
+	"github.com/databrary/sqlboiler/strmangle"
 	"github.com/pkg/errors"
-	"github.com/vattle/sqlboiler/boil"
-	"github.com/vattle/sqlboiler/strmangle"
 )
 
 var (

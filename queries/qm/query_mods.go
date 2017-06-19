@@ -1,6 +1,6 @@
 package qm
 
-import "github.com/vattle/sqlboiler/queries"
+import "github.com/databrary/sqlboiler/queries"
 
 // QueryMod to modify the query object
 type QueryMod func(q *queries.Query)
