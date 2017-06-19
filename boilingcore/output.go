@@ -11,7 +11,6 @@ import (
 	"strconv"
 	"text/template"
 
-	"github.com/databrary/sqlboiler/bdb"
 	"github.com/pkg/errors"
 )
 
@@ -40,7 +39,6 @@ func generateOutput(state *State, data *templateData) error {
 		data:                              data,
 		templates:                         state.Templates,
 		helperTemplates:                   state.HelperTemplates,
-		importSet:                         state.Importer.Standard,
 		combineImportsOnType:              true,
 		combineCustomImportsOnType:        true,
 		combineForeignCustomImportsOnType: false,
@@ -55,7 +53,6 @@ func generateTestOutput(state *State, data *templateData) error {
 		data:                              data,
 		templates:                         state.TestTemplates,
 		helperTemplates:                   state.HelperTemplates,
-		importSet:                         state.Importer.TestStandard,
 		combineImportsOnType:              false,
 		combineCustomImportsOnType:        true,
 		combineForeignCustomImportsOnType: true,
@@ -71,7 +68,6 @@ func generateSingletonOutput(state *State, data *templateData) error {
 		data:            data,
 		templates:       state.SingletonTemplates,
 		helperTemplates: state.HelperTemplates,
-		importNamedSet:  state.Importer.Singleton,
 		fileSuffix:      ".go",
 	})
 }
@@ -84,7 +80,6 @@ func generateSingletonTestOutput(state *State, data *templateData) error {
 		data:            data,
 		templates:       state.SingletonTestTemplates,
 		helperTemplates: state.HelperTemplates,
-		importNamedSet:  state.Importer.TestSingleton,
 		fileSuffix:      ".go",
 	})
 }
@@ -95,9 +90,6 @@ type executeTemplateData struct {
 
 	templates       *templateList
 	helperTemplates []string
-
-	importSet      imports
-	importNamedSet map[string]imports
 
 	combineImportsOnType              bool
 	combineCustomImportsOnType        bool
@@ -114,35 +106,6 @@ func executeTemplates(e executeTemplateData) error {
 	out := templateByteBuffer
 	out.Reset()
 
-	var imps imports
-	imps.standard = e.importSet.standard
-	imps.thirdParty = e.importSet.thirdParty
-	if e.combineImportsOnType {
-		imps = combineTypeImports(imps, e.state.Importer.BasedOnType, e.data.Table.Columns)
-	}
-	if e.combineCustomImportsOnType {
-		imps = combineTypeImports(imps, e.state.Importer.CustomBasedOnType, e.data.Table.Columns)
-	}
-	if e.combineForeignCustomImportsOnType {
-		toOneRs := bdb.ToOneRelationships(e.data.Table.Name, e.data.Tables)
-		toManyRs := bdb.ToManyRelationships(e.data.Table.Name, e.data.Tables)
-		for _, r := range toOneRs {
-			foreignTable := bdb.GetTable(e.data.Tables, r.ForeignTable)
-			imps = combineTypeImports(imps, e.state.Importer.CustomBasedOnType, foreignTable.Columns)
-		}
-		for _, r := range toManyRs {
-			foreignTable := bdb.GetTable(e.data.Tables, r.ForeignTable)
-			imps = combineTypeImports(imps, e.state.Importer.CustomBasedOnType, foreignTable.Columns)
-		}
-
-		for _, f := range e.data.Table.FKeys {
-			foreignTable := bdb.GetTable(e.data.Tables, f.ForeignTable)
-			imps = combineTypeImports(imps, e.state.Importer.CustomBasedOnType, foreignTable.Columns)
-		}
-	}
-	writeFileDisclaimer(out)
-	writePackageName(out, e.state.Config.PkgName)
-	writeImports(out, imps)
 
 	for _, tplName := range e.templates.Templates() {
 		if len(e.helperTemplates) > 0 {
@@ -157,8 +120,18 @@ func executeTemplates(e executeTemplateData) error {
 		}
 	}
 
+	top := &bytes.Buffer{}
+
+	writeFileDisclaimer(top)
+	writePackageName(top, e.state.Config.PkgName)
+	writeImports(top, out)
+
+	if _, err := top.Write(out.Bytes()); err != nil {
+		return err
+	}
+
 	fName := e.data.Table.Name + e.fileSuffix
-	if err := writeFile(e.state.Config.OutFolder, fName, out); err != nil {
+	if err := writeFile(e.state.Config.OutFolder, fName, top); err != nil {
 		return err
 	}
 
@@ -171,27 +144,26 @@ func executeSingletonTemplates(e executeTemplateData) error {
 	}
 
 	out := templateByteBuffer
+	top := &bytes.Buffer{}
 	for _, tplName := range e.templates.Templates() {
 		out.Reset()
-
+		top.Reset()
 		fName := tplName
 		ext := filepath.Ext(fName)
 		fName = rgxRemoveNumberedPrefix.ReplaceAllString(fName[:len(fName)-len(ext)], "")
 
-		imps := imports{
-			standard:   e.importNamedSet[fName].standard,
-			thirdParty: e.importNamedSet[fName].thirdParty,
-		}
-
-		writeFileDisclaimer(out)
-		writePackageName(out, e.state.Config.PkgName)
-		writeImports(out, imps)
-
 		if err := executeTemplate(out, e.templates.Template, tplName, e.data); err != nil {
 			return err
 		}
+		writeFileDisclaimer(top)
+		writePackageName(top, e.state.Config.PkgName)
+		writeImports(top, out)
 
-		if err := writeFile(e.state.Config.OutFolder, fName+e.fileSuffix, out); err != nil {
+		if _, err := top.Write(out.Bytes()); err != nil {
+			return err
+		}
+
+		if err := writeFile(e.state.Config.OutFolder, fName+e.fileSuffix, top); err != nil {
 			return err
 		}
 	}
@@ -207,21 +179,24 @@ func generateTestMainOutput(state *State, data *templateData) error {
 	out := templateByteBuffer
 	out.Reset()
 
-	var imps imports
-	imps.standard = state.Importer.TestMain[state.Config.DriverName].standard
-	imps.thirdParty = state.Importer.TestMain[state.Config.DriverName].thirdParty
-
-	writeFileDisclaimer(out)
-	writePackageName(out, state.Config.PkgName)
-	writeImports(out, imps)
+	top := &bytes.Buffer{}
 
 	if err := executeTemplate(out, state.TestMainTemplate, state.TestMainTemplate.Name(), data); err != nil {
 		return err
 	}
 
-	if err := writeFile(state.Config.OutFolder, "main_test.go", out); err != nil {
+	writeFileDisclaimer(top)
+	writePackageName(top, state.Config.PkgName)
+	writeImports(top, out)
+
+	if _, err := top.Write(out.Bytes()); err != nil {
 		return err
 	}
+
+	if err := writeFile(state.Config.OutFolder, "main_test.go", top); err != nil {
+		return err
+	}
+
 
 	return nil
 }
@@ -240,10 +215,15 @@ func writePackageName(out *bytes.Buffer, pkgName string) {
 
 // writeImports writes the package imports correctly, ignores errors
 // since it's to the concrete buffer type which produces none
-func writeImports(out *bytes.Buffer, imps imports) {
-	if impStr := buildImportString(imps); len(impStr) > 0 {
-		_, _ = fmt.Fprintf(out, "%s\n", impStr)
+func writeImports(top, out *bytes.Buffer) {
+	top.WriteString("import (\n")
+	for k, v := range imps {
+		rgxType := regexp.MustCompile(fmt.Sprintf(`\b%s\b`, k))
+		if rgxType.Match(out.Bytes()) {
+			_, _ = fmt.Fprintf(top, "\t%s\n", v)
+		}
 	}
+	top.WriteString(")\n")
 }
 
 // writeFile writes to the given folder and filename, formatting the buffer
