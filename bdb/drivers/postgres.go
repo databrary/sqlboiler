@@ -152,7 +152,7 @@ func (p *PostgresDriver) Columns(schema, tableName string) ([]bdb.Column, error)
 			)
 			else c.data_type
 			end
-		) as column_type,
+		, c.data_type) as column_type,
 
 		c.udt_name,
 		e.data_type as array_type,
@@ -327,8 +327,17 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 			c.Type = "null.Float64"
 		case "real":
 			c.Type = "null.Float32"
-		case "bit", "interval", "bit varying", "character", "money", "character varying", "cidr", "inet", "macaddr", "text", "uuid", "xml":
+		case "bit", "bit varying", "character", "money", "character varying", "cidr", "macaddr", "text", "uuid", "xml":
+			fmt.Printf("warning: %#v given type null.String", c)
 			c.Type = "null.String"
+		case "interval":
+			c.Type = "custom_types.NullInterval"
+			c.IsCustom = true
+			fmt.Println(c.IsCustom, "in postgres")
+		case "inet":
+			c.Type = "custom_types.NullInet"
+			c.IsCustom = true
+			fmt.Println(c.IsCustom, "in postgres")
 		case `"char"`:
 			c.Type = "null.Byte"
 		case "bytea":
@@ -351,11 +360,18 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 				c.Type = "types.HStore"
 				c.DBType = "hstore"
 			} else {
-				c.Type = "string"
-				fmt.Fprintln(os.Stderr, "Warning: Incompatible data type detected: %s\n", c.UDTName)
+				c.Type = "custom_types.Null"+strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName,"_"), " ")), " "), "")
+				fmt.Printf("Warning: Incompatible data type detected: %s %s\n", c.UDTName, c.Name)
+				fmt.Printf("used %s \n", c.Type)
 			}
+			c.IsCustom = true
+			fmt.Println(c.IsCustom, "in postgres")
 		default:
-			c.Type = "null.String"
+			c.Type = "custom_types.Null"+strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName,"_"), " ")), " "), "")
+			fmt.Printf("Warning: Incompatible data type detected: %s %s\n", c.UDTName, c.Name)
+			fmt.Printf("used %s \n", c.Type)
+			c.IsCustom = true
+			fmt.Println(c.IsCustom, "in postgres")
 		}
 	} else {
 		switch c.DBType {
@@ -369,8 +385,15 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 			c.Type = "float64"
 		case "real":
 			c.Type = "float32"
-		case "bit", "interval", "uuint", "bit varying", "character", "money", "character varying", "cidr", "inet", "macaddr", "text", "uuid", "xml":
+		case "bit", "uuint", "bit varying", "character", "money", "character varying", "cidr", "macaddr", "text", "uuid", "xml":
+			fmt.Printf("warning: %#v given type string", c)
 			c.Type = "string"
+		case "interval":
+			c.Type = "custom_types.Interval"
+			c.IsCustom = true
+		case "inet":
+			c.Type = "custom_types.Inet"
+			c.IsCustom = true
 		case `"char"`:
 			c.Type = "types.Byte"
 		case "json", "jsonb":
@@ -390,14 +413,20 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 				c.Type = "types.HStore"
 				c.DBType = "hstore"
 			} else {
-				c.Type = "string"
-				fmt.Printf("Warning: Incompatible data type detected: %s\n", c.UDTName)
+				c.Type = "custom_types."+strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName,"_"), " ")), " "), "")
+				fmt.Printf("Warning: Incompatible data type detected: %s %s\n", c.UDTName, c.Name)
+				fmt.Printf("used %s \n", c.Type)
 			}
+			c.IsCustom = true
+			fmt.Println(c.IsCustom, "in postgres")
 		default:
-			c.Type = "string"
+			c.Type = "custom_types."+strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName,"_"), " ")), " "), "")
+			fmt.Printf("Warning: default data type used: %s %s\n", c.UDTName, c.Name)
+			fmt.Printf("used %s \n", c.Type)
+			c.IsCustom = true
+			fmt.Println(c.IsCustom, "in postgres")
 		}
 	}
-
 	return c
 }
 
@@ -408,7 +437,12 @@ func getArrayType(c bdb.Column) string {
 		return "types.Int64Array"
 	case "bytea":
 		return "types.BytesArray"
-	case "bit", "interval", "uuint", "bit varying", "character", "money", "character varying", "cidr", "inet", "macaddr", "text", "uuid", "xml":
+	case "interval":
+		return "custom_types.IntervalArray"
+	case "inet":
+		return "custom_types.InetArray"
+	case "bit", "uuint", "bit varying", "character", "money", "character varying", "cidr", "macaddr", "text", "uuid", "xml":
+
 		return "types.StringArray"
 	case "boolean":
 		return "types.BoolArray"

@@ -120,7 +120,7 @@ func Struct(s *Seed, str interface{}, colTypes map[string]string, canBeNull bool
 			continue
 		}
 
-		if fieldTyp.Tag.Get("boil") == "-" {
+		if fieldTyp.Tag.Get("db") == "-" {
 			continue
 		}
 

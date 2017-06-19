@@ -49,6 +49,25 @@ func ToOneRelationships(table string, tables []Table) []ToOneRelationship {
 	return toOneRelationships(localTable, tables)
 }
 
+func HasRelationshipToTableWithCustom(table string, tables []Table) bool {
+	localTable := GetTable(tables, table)
+	toOneRs := toOneRelationships(localTable, tables)
+	toManyRs := toManyRelationships(localTable, tables)
+	for _, r := range toOneRs {
+		foreignTable := GetTable(tables, r.Table)
+		if foreignTable.HasCustom {
+			return true
+		}
+	}
+	for _, r := range toManyRs {
+		foreignTable := GetTable(tables, r.Table)
+		if foreignTable.HasCustom {
+			return true
+		}
+	}
+	return false
+}
+
 // ToManyRelationships relationship lookups
 // Input should be the sql name of a table like: videos
 func ToManyRelationships(table string, tables []Table) []ToManyRelationship {

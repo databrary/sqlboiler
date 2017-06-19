@@ -2,6 +2,7 @@
 package bdb
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/pkg/errors"
@@ -63,7 +64,11 @@ func Tables(db Interface, schema string, whitelist, blacklist []string) ([]Table
 
 		for i, c := range t.Columns {
 			t.Columns[i] = db.TranslateColumnType(c)
+			t.HasCustom = t.HasCustom || t.Columns[i].IsCustom
+			fmt.Println(t.Columns[i].IsCustom, "in interface")
 		}
+
+
 
 		if t.PKey, err = db.PrimaryKeyInfo(schema, name); err != nil {
 			return nil, errors.Wrapf(err, "unable to fetch table pkey info (%s)", name)

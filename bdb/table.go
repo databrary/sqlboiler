@@ -9,7 +9,7 @@ type Table struct {
 	// Example value: "schema_name"."table_name"
 	SchemaName string
 	Columns    []Column
-
+	HasCustom  bool
 	PKey  *PrimaryKey
 	FKeys []ForeignKey
 
@@ -63,4 +63,16 @@ func (t Table) CanLastInsertID() bool {
 	}
 
 	return true
+}
+
+func (t Table)GetCustomColumns() []Column {
+	ret := []Column{}
+	if t.HasCustom {
+		for _, v := range t.Columns {
+			if v.IsCustom {
+				ret = append(ret, v)
+			}
+		}
+	}
+	return ret
 }
