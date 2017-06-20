@@ -327,7 +327,7 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 		case "real":
 			c.Type = "null.Float32"
 		case "bit", "bit varying", "character", "money", "character varying", "cidr", "macaddr", "text", "uuid", "xml":
-			fmt.Printf("warning: %#v given type null.String", c)
+			fmt.Printf("warning: %#v given type null.String\n", c)
 			c.Type = "null.String"
 		case "interval":
 			c.Type = "custom_types.NullInterval"
@@ -383,7 +383,7 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 		case "real":
 			c.Type = "float32"
 		case "bit", "uuint", "bit varying", "character", "money", "character varying", "cidr", "macaddr", "text", "uuid", "xml":
-			fmt.Printf("warning: %#v given type string", c)
+			fmt.Printf("warning: %#v given type string\n", c)
 			c.Type = "string"
 		case "interval":
 			c.Type = "custom_types.Interval"
@@ -415,13 +415,11 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 				fmt.Printf("used %s \n", c.Type)
 			}
 			c.IsCustom = true
-			fmt.Println(c.IsCustom, "in postgres")
 		default:
 			c.Type = "custom_types." + strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName, "_"), " ")), " "), "")
 			fmt.Printf("Warning: default data type used: %s %s\n", c.UDTName, c.Name)
 			fmt.Printf("used %s \n", c.Type)
 			c.IsCustom = true
-			fmt.Println(c.IsCustom, "in postgres")
 		}
 	}
 	return c
