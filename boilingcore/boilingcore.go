@@ -99,12 +99,11 @@ func New(config *Config) (*State, error) {
 // state given.
 func (s *State) Run(includeTests bool) error {
 	singletonData := &templateData{
-		Tables:          s.Tables,
-		Schema:          s.Config.Schema,
-		DriverName:      s.Config.DriverName,
-		UseLastInsertID: s.Driver.UseLastInsertID(),
-		PkgName:         s.Config.PkgName,
-		//TODO: implement elision for tables with no primary keys (like audit and views)
+		Tables:           s.Tables,
+		Schema:           s.Config.Schema,
+		DriverName:       s.Config.DriverName,
+		UseLastInsertID:  s.Driver.UseLastInsertID(),
+		PkgName:          s.Config.PkgName,
 		NoHooks:          s.Config.NoHooks,
 		NoAutoTimestamps: s.Config.NoAutoTimestamps,
 		Dialect:          s.Dialect,
@@ -207,8 +206,10 @@ func (s *State) initTemplates() error {
 			return err
 		}
 	}
+
 	h, err := filepath.Glob(filepath.Join(basePath, templatesHelperDirectory) + string(filepath.Separator) + "*.tpl")
 	s.HelperTemplates = append(s.HelperTemplates, h...)
+
 	return s.processReplacements()
 }
 

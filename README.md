@@ -1,3 +1,112 @@
+## Databrary Changes
+
+```go
+func FilterColumnsByCustom(columns []Column) []Column {
+	var cols []Column
+
+	for _, c := range columns {
+		if c.IsCustom {
+			cols = append(cols, c)
+		}
+	}
+
+	return cols
+}
+
+```
+
+```go
+c.Type = "custom_types.Null" + strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName, "_"), " ")), " "), "")
+
+c.Type = "custom_types." + strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName, "_"), " ")), " "), "")
+```
+
+```go
+func (p *PostgresDriver) IsView(schema, tableName string) (bool, error) {
+	var err error
+
+	query := `
+		select exists (select * from information_schema.views where table_schema = $2 and table_name = $1);`
+
+	var isView bool
+	row := p.dbConn.QueryRow(query, tableName, schema)
+	if err = row.Scan(&isView); err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, err
+	}
+	return isView, nil
+}
+```
+
+```go
+for i, c := range t.Columns {
+    t.Columns[i] = db.TranslateColumnType(c)
+    t.HasCustom = t.HasCustom || t.Columns[i].IsCustom
+    fmt.Println(t.Columns[i].IsCustom, "in interface")
+}
+```
+
+```go
+func HasRelationshipToTableWithCustom(table string, tables []Table) bool {
+	localTable := GetTable(tables, table)
+	toOneRs := toOneRelationships(localTable, tables)
+	toManyRs := toManyRelationships(localTable, tables)
+	for _, r := range toOneRs {
+		foreignTable := GetTable(tables, r.Table)
+		if foreignTable.HasCustom {
+			return true
+		}
+	}
+	for _, r := range toManyRs {
+		foreignTable := GetTable(tables, r.Table)
+		if foreignTable.HasCustom {
+			return true
+		}
+	}
+	return false
+}
+```
+
+```go
+func (t Table) GetCustomColumns() []Column {
+	ret := []Column{}
+	if t.HasCustom {
+		for _, v := range t.Columns {
+			if v.IsCustom {
+				ret = append(ret, v)
+			}
+		}
+	}
+	return ret
+}
+
+func (t Table) HasPrimaryKey() bool {
+	return t.PKey != nil
+}
+```
+
+```go
+func executeTemplateWithHelpers(buf *bytes.Buffer, t *template.Template, name string, data *templateData, helpers []string) error {
+	if t, err := t.ParseFiles(helpers...); err == nil {
+		if err := t.ExecuteTemplate(buf, name, data); err != nil {
+			return errors.Wrapf(err, "failed to execute template: %s", name)
+		}
+	} else {
+		return errors.Wrapf(err, "failed to parse helpers: %s", name)
+	}
+	return nil
+}
+```
+
+```go
+func RandomDBName(r *rand.Rand, input string) string {
+	return randStrFromSource(r, 40)
+}
+```
+
+
 ![sqlboiler logo](http://i.imgur.com/NJtCT7y.png)
 
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/vattle/sqlboiler/blob/master/LICENSE)

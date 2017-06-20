@@ -84,6 +84,7 @@ func FilterColumnsByDefault(defaults bool, columns []Column) []Column {
 	return cols
 }
 
+// used in templates
 func FilterColumnsByCustom(columns []Column) []Column {
 	var cols []Column
 
@@ -95,7 +96,6 @@ func FilterColumnsByCustom(columns []Column) []Column {
 
 	return cols
 }
-
 
 // FilterColumnsByEnum generates the list of columns that are enum values.
 func FilterColumnsByEnum(columns []Column) []Column {

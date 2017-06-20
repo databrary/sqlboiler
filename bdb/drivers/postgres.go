@@ -332,11 +332,9 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 		case "interval":
 			c.Type = "custom_types.NullInterval"
 			c.IsCustom = true
-			fmt.Println(c.IsCustom, "in postgres")
 		case "inet":
 			c.Type = "custom_types.NullInet"
 			c.IsCustom = true
-			fmt.Println(c.IsCustom, "in postgres")
 		case `"char"`:
 			c.Type = "null.Byte"
 		case "bytea":
@@ -366,13 +364,11 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 				fmt.Printf("used %s \n", c.Type)
 			}
 			c.IsCustom = true
-			fmt.Println(c.IsCustom, "in postgres")
 		default:
 			c.Type = "custom_types.Null" + strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName, "_"), " ")), " "), "")
 			fmt.Printf("Warning: Incompatible data type detected: %s %s\n", c.UDTName, c.Name)
 			fmt.Printf("used %s \n", c.Type)
 			c.IsCustom = true
-			fmt.Println(c.IsCustom, "in postgres")
 		}
 	} else {
 		switch c.DBType {
@@ -472,8 +468,7 @@ func (p *PostgresDriver) IndexPlaceholders() bool {
 func (p *PostgresDriver) IsView(schema, tableName string) (bool, error) {
 	var err error
 
-	query := `
-		select exists (select * from information_schema.views where table_schema = $2 and table_name = $1);`
+	query := `select exists (select * from information_schema.views where table_schema = $2 and table_name = $1);`
 
 	var isView bool
 	row := p.dbConn.QueryRow(query, tableName, schema)

@@ -35,22 +35,22 @@ var (
 // generateOutput builds the file output and sends it to outHandler for saving
 func generateOutput(state *State, data *templateData) error {
 	return executeTemplates(executeTemplateData{
-		state:                             state,
-		data:                              data,
-		templates:                         state.Templates,
-		helperTemplates:                   state.HelperTemplates,
-		fileSuffix:                        ".go",
+		state:           state,
+		data:            data,
+		templates:       state.Templates,
+		helperTemplates: state.HelperTemplates,
+		fileSuffix:      ".go",
 	})
 }
 
 // generateTestOutput builds the test file output and sends it to outHandler for saving
 func generateTestOutput(state *State, data *templateData) error {
 	return executeTemplates(executeTemplateData{
-		state:                             state,
-		data:                              data,
-		templates:                         state.TestTemplates,
-		helperTemplates:                   state.HelperTemplates,
-		fileSuffix:                        "_test.go",
+		state:           state,
+		data:            data,
+		templates:       state.TestTemplates,
+		helperTemplates: state.HelperTemplates,
+		fileSuffix:      "_test.go",
 	})
 }
 
@@ -95,7 +95,6 @@ func executeTemplates(e executeTemplateData) error {
 
 	out := templateByteBuffer
 	out.Reset()
-
 
 	for _, tplName := range e.templates.Templates() {
 		if len(e.helperTemplates) > 0 {
