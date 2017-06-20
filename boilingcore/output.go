@@ -39,9 +39,6 @@ func generateOutput(state *State, data *templateData) error {
 		data:                              data,
 		templates:                         state.Templates,
 		helperTemplates:                   state.HelperTemplates,
-		combineImportsOnType:              true,
-		combineCustomImportsOnType:        true,
-		combineForeignCustomImportsOnType: false,
 		fileSuffix:                        ".go",
 	})
 }
@@ -53,9 +50,6 @@ func generateTestOutput(state *State, data *templateData) error {
 		data:                              data,
 		templates:                         state.TestTemplates,
 		helperTemplates:                   state.HelperTemplates,
-		combineImportsOnType:              false,
-		combineCustomImportsOnType:        true,
-		combineForeignCustomImportsOnType: true,
 		fileSuffix:                        "_test.go",
 	})
 }
@@ -90,10 +84,6 @@ type executeTemplateData struct {
 
 	templates       *templateList
 	helperTemplates []string
-
-	combineImportsOnType              bool
-	combineCustomImportsOnType        bool
-	combineForeignCustomImportsOnType bool
 
 	fileSuffix string
 }
@@ -196,7 +186,6 @@ func generateTestMainOutput(state *State, data *templateData) error {
 	if err := writeFile(state.Config.OutFolder, "main_test.go", top); err != nil {
 		return err
 	}
-
 
 	return nil
 }

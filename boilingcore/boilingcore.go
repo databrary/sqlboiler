@@ -345,10 +345,9 @@ func (s *State) initTables(schema string, whitelist, blacklist []string) error {
 		return errors.New("no tables found in database")
 	}
 
-	//TODO: primary keys should be better handled
-	//if err := checkPKeys(s.Tables); err != nil {
-	//	return err
-	//}
+	if err := checkPKeys(s.Tables); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -383,6 +382,7 @@ func (s *State) initOutFolder() error {
 // checkPKeys ensures every table has a primary key column
 func checkPKeys(tables []bdb.Table) error {
 	var missingPkey []string
+
 	for _, t := range tables {
 		if t.PKey == nil && !t.IsView {
 			missingPkey = append(missingPkey, t.Name)

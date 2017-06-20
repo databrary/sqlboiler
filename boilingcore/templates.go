@@ -142,7 +142,6 @@ func replaceTemplate(tpl *template.Template, name, filename string) error {
 	return nil
 }
 
-
 // set is to stop duplication from named enums, allowing a template loop
 // to keep some state
 type once map[string]struct{}
@@ -228,7 +227,7 @@ var templateFunctions = template.FuncMap{
 	// dbdrivers ops
 	"filterColumnsByAuto":    bdb.FilterColumnsByAuto,
 	"filterColumnsByDefault": bdb.FilterColumnsByDefault,
-	"filterColumnsByCustom": bdb.FilterColumnsByCustom,
+	"filterColumnsByCustom":  bdb.FilterColumnsByCustom,
 	"filterColumnsByEnum":    bdb.FilterColumnsByEnum,
 	"sqlColDefinitions":      bdb.SQLColDefinitions,
 	"columnNames":            bdb.ColumnNames,
