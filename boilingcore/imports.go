@@ -52,33 +52,7 @@ var imps = map[string]string{
 
 	"types.Hstore": `"github.com/databrary/sqlboiler/types"`,
 
-	"custom_types.Interval": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.NullInterval": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.Inet": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.NullInet": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.Segment": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.NullSegment": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.Release": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.NullRelease": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.Permission": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.NullPermission": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.NoticeDelivery": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.NullNoticeDelivery": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.DataType": `"github.com/databrary/databrary/db/models/custom_types"`,
-
-	"custom_types.NullDataType": `"github.com/databrary/databrary/db/models/custom_types"`,
+	`custom_types`: `"github.com/databrary/databrary/db/models/custom_types"`,
 
 	"reflect": `"reflect"`, //TODO: this was uncommented
 
