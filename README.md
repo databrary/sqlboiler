@@ -106,7 +106,7 @@ type SlotRelease struct {
 }
 ```
 
-Don't pay attention to the `` markup yet (https://stackoverflow.com/a/30889373). Note that `container` in `slot_release` is mapped to
+Don't pay attention to the `db:` markup yet (https://stackoverflow.com/a/30889373). Note that `container` in `slot_release` is mapped to
 `Container int` in `SlotRelease` - the standard distribution of SQLBoiler would do this successfully
 too since `container` is of `int` type. Now note that `segment` in `slot_release` has a `column_type` of `USER-DEFINED`.
 In the standard distribution this would lead to `Segment` being of `string` type in `SlotRelease`. It's this extension
