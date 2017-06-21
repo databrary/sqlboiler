@@ -1,7 +1,20 @@
 # Databrary Changes
 
-This part of the documentation outlines changes made to sqlboiler in order to support
+This documentation outlines changes made to sqlboiler in order to support
 custom types (i.e. project specific database types) and views.
+
+## Table of Contents
+
+
+
+* [Type mapping](#type-mapping)
+* [Templates](#templates)
+ * [Custom Types](#custom-types)
+    * [Testing](#testing)
+    * [Imports](#imports)
+ * [Views](#views)
+* [Tests](#tests)
+
 
 ## Type mapping
 
