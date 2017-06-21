@@ -334,6 +334,9 @@ func (t Table) HasPrimaryKey() bool {
 ## Tests
 
 All of the test harness code is template generated too, @ `databrary/config/sqlboiler/templates/templates_test/singleton` and `databrary/config/sqlboiler/templates/templates_test/main_test`.
+
+**If you want to change test behavior do not forget to update the test generation templates!**
+
 This is slightly counter-intuitive since it seems like at least the database connections should be boiler plate. Hence the only template that has actual template code in it is
 `boil_suites_test.tpl`. `boil_suites_test.tpl` was extended to include a "live" test:
 
