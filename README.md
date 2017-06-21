@@ -1,6 +1,6 @@
 # Databrary Changes
 
-This documentation outlines changes made to sqlboiler in order to support
+This documentation outlines changes made to [SQLBoiler](https://github.com/vattle/sqlboiler) in order to support
 custom types (i.e. project specific database types) and views.
 
 ## Table of Contents
@@ -18,7 +18,7 @@ custom types (i.e. project specific database types) and views.
 
 ## Type mapping
 
-SQLBoiler works by inspecting all of the columns in all of the tables in a schema
+[SQLBoiler](https://github.com/vattle/sqlboiler) works by inspecting all of the columns in all of the tables in a schema
 and mapping their types (int, float, varchar, enum, etc.) to go types. For most of
 the basic types SQLBoiler maps correctly (for nullable types it uses https://github.com/nullbio/null)
 
