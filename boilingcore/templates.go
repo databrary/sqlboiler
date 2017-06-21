@@ -233,5 +233,4 @@ var templateFunctions = template.FuncMap{
 	"columnNames":            bdb.ColumnNames,
 	"columnDBTypes":          bdb.ColumnDBTypes,
 	"getTable":               bdb.GetTable,
-	"hasRelationToCustom":    bdb.HasRelationshipToTableWithCustom,
 }

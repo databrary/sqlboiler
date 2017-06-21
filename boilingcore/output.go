@@ -201,8 +201,6 @@ func writePackageName(out *bytes.Buffer, pkgName string) {
 	_, _ = fmt.Fprintf(out, "package %s\n\n", pkgName)
 }
 
-// writeImports writes the package imports correctly, ignores errors
-// since it's to the concrete buffer type which produces none
 func writeImports(top, out *bytes.Buffer) {
 	top.WriteString("import (\n")
 	for k, v := range imps {

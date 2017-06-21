@@ -313,6 +313,7 @@ func (p *PostgresDriver) ForeignKeyInfo(schema, tableName string) ([]bdb.Foreign
 // TranslateColumnType converts postgres database types to Go types, for example
 // "varchar" to "string" and "bigint" to "int64". It returns this parsed data
 // as a Column object.
+
 func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 	if c.Nullable {
 		switch c.DBType {
@@ -360,9 +361,24 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 				c.DBType = "hstore"
 			} else {
 				c.Type = "custom_types.Null" + strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName, "_"), " ")), " "), "")
-				fmt.Printf("Warning: Incompatible data type detected: %s %s\n", c.UDTName, c.Name)
+				fmt.Printf("Warning: USER_DEFINED data type detected: %s %s\n", c.UDTName, c.Name)
 				fmt.Printf("used %s \n", c.Type)
 			}
+			c.IsCustom = true
+		case "permission":
+			c.Type = "custom_types.NullPermission"
+			c.IsCustom = true
+		case "notice_delivery":
+			c.Type = "custom_types.NullNoticeDelivery"
+			c.IsCustom = true
+		case "data_type":
+			c.Type = "custom_types.NullDataType"
+			c.IsCustom = true
+		case "action":
+			c.Type = "custom_types.NullAction"
+			c.IsCustom = true
+		case "release":
+			c.Type = "custom_types.NullRelease"
 			c.IsCustom = true
 		default:
 			c.Type = "custom_types.Null" + strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName, "_"), " ")), " "), "")
@@ -411,9 +427,24 @@ func (p *PostgresDriver) TranslateColumnType(c bdb.Column) bdb.Column {
 				c.DBType = "hstore"
 			} else {
 				c.Type = "custom_types." + strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName, "_"), " ")), " "), "")
-				fmt.Printf("Warning: Incompatible data type detected: %s %s\n", c.UDTName, c.Name)
+				fmt.Printf("Warning: USER-DEFINED data type detected: %s %s\n", c.UDTName, c.Name)
 				fmt.Printf("used %s \n", c.Type)
 			}
+			c.IsCustom = true
+		case "permission":
+			c.Type = "custom_types.Permission"
+			c.IsCustom = true
+		case "notice_delivery":
+			c.Type = "custom_types.NoticeDelivery"
+			c.IsCustom = true
+		case "data_type":
+			c.Type = "custom_types.DataType"
+			c.IsCustom = true
+		case "action":
+			c.Type = "custom_types.Action"
+			c.IsCustom = true
+		case "release":
+			c.Type = "custom_types.Release"
 			c.IsCustom = true
 		default:
 			c.Type = "custom_types." + strings.Join(strings.Split(strings.Title(strings.Join(strings.Split(c.UDTName, "_"), " ")), " "), "")
